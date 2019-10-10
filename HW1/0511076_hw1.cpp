@@ -1,6 +1,7 @@
 # include <iostream>
 # include <fstream>
 # include <queue>
+# include <vector>
 
 using namespace std;
 
@@ -14,6 +15,7 @@ struct Node{
     Node* right;
     int rightID;
     int count;
+    vector<int> chain;
 };
 
 class Tree{
@@ -21,7 +23,7 @@ public:
     Tree();
     ~Tree();
     void Insert_Node(Node*);
-    void Preorder_Print(Node*);     //test whether the tree work.
+    void Preorder_Print(Node*);     // test whether the tree work.
     int MaxChainLen();  
     void ResetAllCount(Node*); 
     void CalChainLen(Node*);
@@ -29,11 +31,13 @@ public:
     int RightLen(Node*);
     bool Is_Vowel(Node*);
     void DestroyRecursive(Node*);
+    vector<int> GetMaxChainID();
     Node* GetRoot();
 
 private:
     int size;
     int maxchainlen;
+    Node* maxchainroot;
     Node* root;
     queue<Node*> Q;
 };
@@ -42,19 +46,19 @@ private:
 
 int main(int argc, char** argv){
     if (argc != 3){
-	cout << "usage: ./<excute file> <input file> <outputfile>\n";
+	//cout << "usage: ./<excute file> <input file> <outputfile>\n";
 	return 1;
     }
     
     fstream input, output;
     input.open(argv[1], fstream::in);
     if (!input){
-	cerr << "Could't find the " << argv[1] << " file.\n";
+	//cerr << "Could't find the " << argv[1] << " file.\n";
 	return 1;
     }
     output.open(argv[2], fstream::out);
     if (!output){
-	cerr << "could't create the " << argv[2] << " file.\n";
+	//cerr << "could't create the " << argv[2] << " file.\n";
 	return 1;
     }
 
@@ -71,15 +75,20 @@ int main(int argc, char** argv){
 	n->left = NULL;
 	n->right = NULL;
 	n->count = 0;
+	n->chain.clear();
 	alpha.Insert_Node(n);
     }
+
     //alpha.Preorder_Print(alpha.GetRoot());
     alpha.ResetAllCount(alpha.GetRoot());
     alpha.CalChainLen(alpha.GetRoot());
 
     if (mode == 0) output << alpha.MaxChainLen();
     else if (mode == 1){
-
+	output << alpha.MaxChainLen() << endl;
+	output << endl;
+	vector<int> ans = alpha.GetMaxChainID();
+	for (vector<int>::iterator it = ans.begin(); it != ans.end(); ++it) output << *it << endl;
     }
 
     input.close();
@@ -93,12 +102,13 @@ int main(int argc, char** argv){
 
 Tree::Tree(){
     size = maxchainlen = 0;
-    root = NULL;
+    maxchainroot = root = NULL;
     while (!Q.empty()) Q.pop();
 }
 
 Tree::~Tree(){
     DestroyRecursive(root);
+    maxchainroot = root = NULL;
 }
 
 void Tree::DestroyRecursive(Node* ptr){
@@ -147,11 +157,20 @@ void Tree::CalChainLen(Node* leaf){
     int leftlen = LeftLen(leaf);
     int rightlen = RightLen(leaf);
     if (Is_Vowel(leaf)){
-	if (maxchainlen < leftlen + rightlen + 1) maxchainlen = leftlen + rightlen;
-	if (leftlen >= rightlen) leaf->count = leftlen + 1;
-	else leaf->count = rightlen + 1;
+	if (maxchainlen < leftlen + rightlen){
+	    maxchainlen = leftlen + rightlen;
+	    maxchainroot = leaf;
+	}
+	if (leftlen >= rightlen){
+	    leaf->count = leftlen + 1;
+	    leaf->chain = leaf->left? leaf->left->chain: vector<int>();
+	}
+	else{
+	    leaf->count = rightlen + 1;
+	    leaf->chain = leaf->right? leaf->right->chain: vector<int>();
+	}
+	leaf->chain.push_back(leaf->ID);
     }
-    else leaf->count = 0;
 }
 
 int Tree::LeftLen(Node* leaf){
@@ -171,14 +190,27 @@ bool Tree::Is_Vowel(Node* leaf){
     else return false;
 }
 
-void Tree::ResetAllCount(Node* leaf){
+void Tree::ResetAllCount(Node* leaf){ 
+    maxchainlen = 0;
     leaf->count = 0;
     if (leaf->left) ResetAllCount(leaf->left);
     if (leaf->right) ResetAllCount(leaf->right);
 }
 
-
-
-
-
+vector<int> Tree::GetMaxChainID(){
+    int leftlen = maxchainroot->left? maxchainroot->left->chain.size(): 0;
+    int rightlen = maxchainroot->right? maxchainroot->right->chain.size(): 0;
+    vector<int> ans;
+    if (leftlen >= rightlen){
+	for (int i = 0; i < leftlen; i++) ans.push_back(maxchainroot->left->chain[i]);
+	ans.push_back(maxchainroot->ID);
+	for (int i = rightlen-1; i >= 0; i--) ans.push_back(maxchainroot->right->chain[i]);
+    }
+    else{
+        for (int i = 0; i < rightlen; i++) ans.push_back(maxchainroot->right->chain[i]);
+        ans.push_back(maxchainroot->ID);
+        for (int i = leftlen-1; i >= 0; i--) ans.push_back(maxchainroot->left->chain[i]);
+    }
+    return ans;
+}
 
