@@ -13,6 +13,7 @@ struct Node{
     int leftID;
     Node* right;
     int rightID;
+    int count;
 };
 
 class Tree{
@@ -20,16 +21,19 @@ public:
     Tree();
     ~Tree();
     void Insert_Node(Node*);
-    int MaxChainLen(int);
-    void Preorder_Print(Node*);
-    void Inorder_Traversal(Node);   //test whether the tree work.
-    bool Is_Vowel(Node);
+    void Preorder_Print(Node*);     //test whether the tree work.
+    int MaxChainLen();  
+    void ResetAllCount(Node*); 
+    void CalChainLen(Node*);
+    int LeftLen(Node*);
+    int RightLen(Node*);
+    bool Is_Vowel(Node*);
     void DestroyRecursive(Node*);
     Node* GetRoot();
 
 private:
     int size;
-    int chainlen;
+    int maxchainlen;
     Node* root;
     queue<Node*> Q;
 };
@@ -65,11 +69,21 @@ int main(int argc, char** argv){
 	input >> n->leftID;
 	input >> n->rightID;
 	n->left = NULL;
-	n->right= NULL;
+	n->right = NULL;
+	n->count = 0;
 	alpha.Insert_Node(n);
     }
     //alpha.Preorder_Print(alpha.GetRoot());
+    alpha.ResetAllCount(alpha.GetRoot());
+    alpha.CalChainLen(alpha.GetRoot());
 
+    if (mode == 0) output << alpha.MaxChainLen();
+    else if (mode == 1){
+
+    }
+
+    input.close();
+    output.close();
     return 0;
 }
 
@@ -78,7 +92,7 @@ int main(int argc, char** argv){
 /////////////////////////////////// implementation ///////////////////////////////////
 
 Tree::Tree(){
-    size = chainlen = 0;
+    size = maxchainlen = 0;
     root = NULL;
     while (!Q.empty()) Q.pop();
 }
@@ -123,6 +137,45 @@ Node* Tree::GetRoot(){
     return root;
 }
 
+int Tree::MaxChainLen(){
+    return maxchainlen;
+}
+
+void Tree::CalChainLen(Node* leaf){ 
+    if (leaf->left) CalChainLen(leaf->left);
+    if (leaf->right) CalChainLen(leaf->right);
+    int leftlen = LeftLen(leaf);
+    int rightlen = RightLen(leaf);
+    if (Is_Vowel(leaf)){
+	if (maxchainlen < leftlen + rightlen + 1) maxchainlen = leftlen + rightlen;
+	if (leftlen >= rightlen) leaf->count = leftlen + 1;
+	else leaf->count = rightlen + 1;
+    }
+    else leaf->count = 0;
+}
+
+int Tree::LeftLen(Node* leaf){
+    if (leaf->left) return leaf->left->count;
+    else return 0;
+}
+
+int Tree::RightLen(Node* leaf){
+    if (leaf->right) return leaf->right->count;
+    else return 0;
+}
+
+bool Tree::Is_Vowel(Node* leaf){
+    if (leaf->ch == 'a' || leaf->ch == 'e' || leaf->ch == 'i' ||
+	leaf->ch == 'o' || leaf->ch == 'u'	                )
+	return true;
+    else return false;
+}
+
+void Tree::ResetAllCount(Node* leaf){
+    leaf->count = 0;
+    if (leaf->left) ResetAllCount(leaf->left);
+    if (leaf->right) ResetAllCount(leaf->right);
+}
 
 
 
