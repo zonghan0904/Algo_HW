@@ -83,7 +83,7 @@ int main(int argc, char** argv){
     alpha.ResetAllCount(alpha.GetRoot());
     alpha.CalChainLen(alpha.GetRoot());
 
-    if (mode == 0) output << alpha.MaxChainLen();
+    if (mode == 0) output << alpha.MaxChainLen() << endl;
     else if (mode == 1){
 	output << alpha.MaxChainLen() << endl;
 	output << endl;
