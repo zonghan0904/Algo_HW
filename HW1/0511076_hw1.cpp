@@ -1,6 +1,6 @@
 # include <iostream>
 # include <fstream>
-# include <queue>
+# include <map>
 # include <vector>
 
 using namespace std;
@@ -39,7 +39,7 @@ private:
     int maxchainlen;
     Node* maxchainroot;
     Node* root;
-    queue<Node*> Q;
+    map<int, Node*> M;
 };
 
 /////////////////////////////////// main ///////////////////////////////////
@@ -103,7 +103,7 @@ int main(int argc, char** argv){
 Tree::Tree(){
     size = maxchainlen = 0;
     maxchainroot = root = NULL;
-    while (!Q.empty()) Q.pop();
+    M.clear();
 }
 
 Tree::~Tree(){
@@ -126,20 +126,18 @@ void Tree::Preorder_Print(Node* leaf){
 }
 
 void Tree::Insert_Node(Node* leaf){
-    if (!Q.empty() && leaf->leftID == Q.front()->ID){
-        leaf->left = Q.front();
-        Q.pop();
+    map<int, Node*>::iterator it_left = M.find(leaf->leftID);
+    map<int, Node*>::iterator it_right = M.find(leaf->rightID);
+    if (it_left != M.end()){
+        leaf->left = it_left->second;
+        M.erase(it_left);
     }
-    if (!Q.empty() && leaf->rightID == Q.front()->ID){
-        leaf->right = Q.front();
-        Q.pop();
-    }
-    if (!Q.empty() && leaf->leftID == Q.front()->ID){
-        leaf->left = Q.front();
-        Q.pop();
+    if (it_right != M.end()){
+        leaf->right = it_right->second;
+        M.erase(it_right);
     }
     root = leaf;
-    Q.push(leaf);
+    M.insert(pair<int, Node*>(leaf->ID, leaf));
     size++;
 }
 
