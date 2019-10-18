@@ -15,7 +15,6 @@ struct Node{
     Node* right;
     int rightID;
     int count;
-    vector<int> chain;
 };
 
 class Tree{
@@ -31,7 +30,9 @@ public:
     int RightLen(Node*);
     bool Is_Vowel(Node*);
     void DestroyRecursive(Node*);
-    vector<int> GetMaxChainID();
+    void PrintMaxChainID(fstream&);
+    void PrintHeadSide(fstream&, Node*);
+    void PrintEndSide(fstream&, Node*);
     Node* GetRoot();
 
 private:
@@ -75,7 +76,6 @@ int main(int argc, char** argv){
 	n->left = NULL;
 	n->right = NULL;
 	n->count = 0;
-	n->chain.clear();
 	alpha.Insert_Node(n);
     }
 
@@ -87,8 +87,7 @@ int main(int argc, char** argv){
     else if (mode == 1){
 	output << alpha.MaxChainLen() << endl;
 	output << endl;
-	vector<int> ans = alpha.GetMaxChainID();
-	for (vector<int>::iterator it = ans.begin(); it != ans.end(); ++it) output << *it << endl;
+        alpha.PrintMaxChainID(output);
     }
 
     input.close();
@@ -161,13 +160,10 @@ void Tree::CalChainLen(Node* leaf){
 	}
 	if (leftlen >= rightlen){
 	    leaf->count = leftlen + 1;
-	    leaf->chain = leaf->left? leaf->left->chain: vector<int>();
 	}
 	else{
 	    leaf->count = rightlen + 1;
-	    leaf->chain = leaf->right? leaf->right->chain: vector<int>();
 	}
-	leaf->chain.push_back(leaf->ID);
     }
 }
 
@@ -195,20 +191,34 @@ void Tree::ResetAllCount(Node* leaf){
     if (leaf->right) ResetAllCount(leaf->right);
 }
 
-vector<int> Tree::GetMaxChainID(){
-    int leftlen = maxchainroot->left? maxchainroot->left->chain.size(): 0;
-    int rightlen = maxchainroot->right? maxchainroot->right->chain.size(): 0;
-    vector<int> ans;
-    if (leftlen >= rightlen){
-	for (int i = 0; i < leftlen; i++) ans.push_back(maxchainroot->left->chain[i]);
-	ans.push_back(maxchainroot->ID);
-	for (int i = rightlen-1; i >= 0; i--) ans.push_back(maxchainroot->right->chain[i]);
+void Tree::PrintMaxChainID(fstream& output){
+    if (LeftLen(maxchainroot) >= RightLen(maxchainroot)){
+	PrintHeadSide(output, maxchainroot->left);
+	output << maxchainroot->ID << endl;
+	PrintEndSide(output, maxchainroot->right);
     }
     else{
-        for (int i = 0; i < rightlen; i++) ans.push_back(maxchainroot->right->chain[i]);
-        ans.push_back(maxchainroot->ID);
-        for (int i = leftlen-1; i >= 0; i--) ans.push_back(maxchainroot->left->chain[i]);
+	PrintHeadSide(output, maxchainroot->right);
+	output << maxchainroot->ID << endl;
+	PrintEndSide(output, maxchainroot->left);
     }
-    return ans;
+}
+
+void Tree::PrintHeadSide(fstream& output, Node* leaf){
+    int leftlen = LeftLen(leaf);
+    int rightlen = RightLen(leaf);
+    if (leftlen > 0 || rightlen > 0){
+	leftlen >= rightlen? PrintHeadSide(output, leaf->left): PrintHeadSide(output, leaf->right);
+    }
+    output << leaf->ID << endl;
+}
+
+void Tree::PrintEndSide(fstream& output, Node* leaf){
+    int leftlen = LeftLen(leaf);
+    int rightlen = RightLen(leaf);
+    output << leaf->ID << endl;
+    if (leftlen > 0 || rightlen > 0){
+        leftlen >= rightlen? PrintEndSide(output, leaf->left): PrintEndSide(output, leaf->right);
+    }
 }
 
