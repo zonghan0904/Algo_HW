@@ -8,10 +8,11 @@ using namespace std;
 
 // ############################ declaration  ############################
 
-vector<int> A, V;
-int field_A, crops_K;
+vector<int> A(1, 0), V(1, 0);
 
-int table[150][150];
+vector<vector<int> > table;
+
+int field_A, crops_K;
 
 int max_benefit(int mode);
 
@@ -36,6 +37,10 @@ int main(int argc, char** argv){
 	
 	fin >> mode >> field_A >> crops_K;
 
+	for (int i = 0; i < crops_K+1; i++){
+		table.push_back(vector<int>(field_A+1, 0));
+	}
+	
 	for (int i = 0; i < crops_K; i++){
 		fin >> crop_A >> crop_V;
 		A.push_back(crop_A);
@@ -44,11 +49,11 @@ int main(int argc, char** argv){
 
 clock_t start, stop;
 
-start = clock(); //開始時間
+start = clock(); // timer start
 
 	cout << max_benefit(mode) << endl;
 
-stop = clock(); //結束時間
+stop = clock();  // timer stop
 
 cout << "executed time: " << double(stop - start) / CLOCKS_PER_SEC << endl;
 
@@ -59,7 +64,7 @@ cout << "executed time: " << double(stop - start) / CLOCKS_PER_SEC << endl;
 // ############################ implementation ############################
 
 int recursive(int index, int area){
-	if (index >= crops_K) return 0;			   // iterated all situations
+	if (index > crops_K) return 0;			   // iterated all situations
 	int noplant = recursive(index+1, area);
 	if (area < A[index]) return noplant;       // remain size < current size
 	else{
@@ -78,7 +83,7 @@ int memorized(int index, int area){
 }
 
 int filltable(int index, int area){
-	if (index >= crops_K) return 0;	
+	if (index > crops_K) return 0;	
 	if (table[index][area] != 0) return table[index][area];		   
 	int noplant = filltable(index+1, area);
 	if (area < A[index]){
@@ -94,12 +99,12 @@ int filltable(int index, int area){
 
 int max_benefit(int mode){
 	if (mode == 0){           // recursive mode
-		return recursive(0, field_A);
+		return recursive(1, field_A);
 	}
 	else if (mode == 1){      // dp mode
-		return dynamic_programming(0, field_A);
+		return dynamic_programming(1, field_A);
 	}
 	else if (mode == 2){      // memorized mode
-		return memorized(0, field_A);
+		return memorized(1, field_A);
 	}	
 }
