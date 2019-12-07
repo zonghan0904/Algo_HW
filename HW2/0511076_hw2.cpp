@@ -44,19 +44,20 @@ int main(int argc, char** argv){
 		V.push_back(crop_V);
 	}
 
-clock_t start, stop;
-start = clock(); // timer start
+//clock_t start, stop;
+//start = clock(); // timer start
 
 	ans = max_benefit(mode);
 
-stop = clock();  // timer stop
+//stop = clock();  // timer stop
 
-fout << ans << endl;
-if (mode == 0) cout << "recursive mode: " << endl;
-else if (mode == 1) cout << "dynamic programming mode: " << endl;
-else if (mode == 2) cout << "memorized recursive mode: " << endl;
-cout << "max benefit: " << ans << endl;
-cout << "execution time: " << double(stop - start) / CLOCKS_PER_SEC << endl;
+	fout << ans << endl;
+	
+//if (mode == 0) cout << "recursive mode: " << endl;
+//else if (mode == 1) cout << "dynamic programming mode: " << endl;
+//else if (mode == 2) cout << "memorized recursive mode: " << endl;
+//cout << "max benefit: " << ans << endl;
+//cout << "execution time: " << double(stop - start) / CLOCKS_PER_SEC << endl;
 
 	return 0;
 }
