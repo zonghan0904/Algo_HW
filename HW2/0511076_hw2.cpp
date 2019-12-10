@@ -1,9 +1,10 @@
 # include <iostream>
 # include <fstream>
 # include <vector>
-# include <ctime>
+//# include <chrono>
 
 using namespace std;
+//using namespace std::chrono;
 
 // ############################ declaration  ############################
 
@@ -44,12 +45,12 @@ int main(int argc, char** argv){
 		V.push_back(crop_V);
 	}
 
-//clock_t start, stop;
-//start = clock(); // timer start
+//auto start = high_resolution_clock::now(); // timer start
 
 	ans = max_benefit(mode);
 
-//stop = clock();  // timer stop
+//auto stop = high_resolution_clock::now();  // timer stop
+//auto duration = duration_cast<nanoseconds>(stop - start);
 
 	fout << ans << endl;
 	
@@ -57,7 +58,7 @@ int main(int argc, char** argv){
 //else if (mode == 1) cout << "dynamic programming mode: " << endl;
 //else if (mode == 2) cout << "memorized recursive mode: " << endl;
 //cout << "max benefit: " << ans << endl;
-//cout << "execution time: " << double(stop - start) / CLOCKS_PER_SEC << endl;
+//cout << "execution time: " << duration.count() << " nanoseconds" << endl;
 
 	return 0;
 }
@@ -78,7 +79,7 @@ int dynamic_programming(int index, int area){
 	for (int i = 1; i <= crops_K; i++){
 		for (int j = 0; j <= field_A; j++){
 			int plant, noplant = table[i-1][j];
-			plant = j - A[i] >= 0 ? V[i] + table[i][j-A[i]] : 0;  // check the current crop's size is smaller than available area. 
+			plant = j - A[i] >= 0 ? V[i] + table[i][j-A[i]] : noplant;  // check the current crop's size is smaller than available area. 
 			table[i][j] = plant > noplant ? plant : noplant;  // store the optimal result.
 		}
 	}
