@@ -18,7 +18,7 @@ vector<string> capacity;
 template<class T>
 void ReadList(fstream &fin, T value, vector<T> &container);
 bool BFS(const vector<vector<int> > &rnet, vector<int> &pre, const vector<int> &node_capacity);
-int Max_flow(int total);
+int Max_flow(vector<vector<int> > &rnet, int total);
 void Print_table();
 
 //############################## main function ################################ 
@@ -48,7 +48,8 @@ int main(int argc, char** argv){
 	}
 	//Print_table();
 	//cout << "maximum flow = " << Max_flow(total) << endl;
-	fout << Max_flow(total) << endl;
+	fout << Max_flow(table, total) << endl;
+	//Print_table();
 	fin.close();
 	fout.close();
 	return 0;
@@ -84,8 +85,7 @@ bool BFS(const vector<vector<int> > &rnet, vector<int> &pre, const vector<int> &
 	else return false;	
 }
 
-int Max_flow(int total){
-	vector<vector<int> > rnet(table);
+int Max_flow(vector<vector<int> > &rnet, int total){
 	vector<int> node_capacity(total+2, INT_MAX);
 	for (int i = 1; i <= total; i++){
 		if (capacity[i-1] == "Inf") node_capacity[i] = INT_MAX;
